@@ -1,5 +1,7 @@
-var http = require("http");
-var url = require("url");
+var formidable = require('formidable'),
+	http = require("http"),
+	url = require("url");
+
 
 function start(route, handle) {
 	function onRequest(request, response) {

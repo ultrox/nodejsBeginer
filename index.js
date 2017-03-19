@@ -8,6 +8,7 @@ handle['/']       = requestHandlers.start;
 handle['/start']  = requestHandlers.start;
 handle['/upload'] = requestHandlers.upload;
 handle['/marko']  = requestHandlers.marko;
+handle['/show']  = requestHandlers.show;
 
 //zato sto server treba glagol, ne imenicu :D
 server.start(router.route, handle);
