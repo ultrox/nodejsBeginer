@@ -2,6 +2,7 @@
 //when user ask for /start path, start function needs to handle that
 var querystring = require("querystring");
 var fs = require('fs');
+var formidable = require('formidable');
 
 function start(response) {
 	function sleep(ms) {
@@ -15,9 +16,12 @@ function start(response) {
 		'content="text/html; charset=UTF-8" />'+
 		'</head>'+
 		'<body>'+
-		'<form action="/upload" method="post">'+
-		'<textarea name="text" rows="20" cols="60"></textarea>'+
-		'<input type="submit" value="Submit text" />'+
+		'<form action="/upload" method="post" enctype="multipart/form-data">'
+		+
+		'<input type="file" name="upload" />'
+		+
+		'<input type="submit" value="Submit file" />'
+		+
 		'</form>'+
 		'</body>'+
 		'</html>';
@@ -34,11 +38,26 @@ function show(response) {
 	fs.createReadStream("/tmp/test.png").pipe(response);
 }
 
-function upload(response, postData){
+function upload(response, request){
 	console.log("Request handler 'upload' was called.");
-	response.writeHead(200, {"Content-Type": "text/plain"});
-	console.log('sta je postdata', typeof postData);
-	response.write("You've sent the text: " + postData);
+	var form = new formidable.IncomingForm();
+	console.log('about to parse');
+	form.parse(request, function(error, fields, files) {
+		console.log('parsing done');
+		if(files.upload) {
+			fs.rename(files.upload.path, '/tmp/test.png', function(error) {
+				if(error) {
+					fs.unlink("/tmp/test.png");
+					fs.rename(files.upload.path, "/tmp/test.png");
+				}
+			})
+		}
+	})
+
+	response.writeHead(200, {"Content-Type": "text/html"});
+
+	response.write('received image: <br />');
+	response.write('<img src="/show" />');
 	response.end();
 }
 
